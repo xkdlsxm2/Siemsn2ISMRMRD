@@ -18,7 +18,7 @@ def transform_kspace_to_image(k, dim=None, img_shape=None):
 
     img = fftshift(ifftn(ifftshift(k, axes=dim), s=img_shape, axes=dim), axes=dim)
     img *= np.sqrt(np.prod(np.take(img.shape, dim)))
-    return img
+    return img.astype(np.complex64)
 
 
 def transform_image_to_kspace(img, dim=None, k_shape=None):
@@ -35,4 +35,4 @@ def transform_image_to_kspace(img, dim=None, k_shape=None):
 
     k = fftshift(fftn(ifftshift(img, axes=dim), s=k_shape, axes=dim), axes=dim)
     k /= np.sqrt(np.prod(np.take(img.shape, dim)))
-    return k
+    return k.astype(np.complex64)
