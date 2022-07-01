@@ -11,9 +11,8 @@ from ismrmrdtools import show, transform
 
 filepath = pathlib.Path(r"C:\Users\z0048drc\Desktop\data_fm\MRCP\extracted")
 # filename = pathlib.Path("meas_MID00059_FID01994_t2_space_cor_p3_trig_384_iso.h5")
-filenames = [pathlib.Path(i) for i in os.listdir(filepath) if
-             'meas_MID00052_FID02811_t2_space_cor_p3_trig_384_iso.h5' in i]
-savepath = pathlib.Path(r'C:\Users\z0048drc\Desktop\data_fm\MRCP\extracted_processed')
+filenames = [pathlib.Path(i) for i in os.listdir(filepath) if '.h5' in i]
+savepath = pathlib.Path(r'X:\data\mrcp\data')
 
 for filename in filenames:
     h5path = filepath / filename
