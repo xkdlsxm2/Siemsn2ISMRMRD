@@ -11,8 +11,9 @@ from ismrmrdtools import show, transform
 
 filepath = pathlib.Path(r"C:\Users\z0048drc\Desktop\data_fm\MRCP\extracted")
 # filename = pathlib.Path("meas_MID00059_FID01994_t2_space_cor_p3_trig_384_iso.h5")
-filenames = [pathlib.Path(i) for i in os.listdir(filepath) if 'meas_MID00052_FID02811_t2_space_cor_p3_trig_384_iso.h5' in i]
-savepath = pathlib.Path(r'X:\data\mrcp\data')
+filenames = [pathlib.Path(i) for i in os.listdir(filepath) if
+             'meas_MID00052_FID02811_t2_space_cor_p3_trig_384_iso.h5' in i]
+savepath = pathlib.Path(r'C:\Users\z0048drc\Desktop\data_fm\MRCP\extracted_processed')
 
 for filename in filenames:
     h5path = filepath / filename
@@ -55,10 +56,24 @@ for filename in filenames:
                     ref_max_idx = y if y > ref_max_idx else ref_max_idx
                     ref_min_idx = y if y <= ref_min_idx else ref_min_idx
 
-                all_data[:, :, y, z] += transform.transform_image_to_kspace(acq.data, [1])
+                all_data[:, :, y, z] += acq.data
 
     dupl_check = np.where(dupl_check == 0, 1, dupl_check)  # replace 0 to 1 to divide with.
     all_data[:, :] /= dupl_check
+
+    # filter for
+    offset = 4
+    filter = np.ones_like(all_data)
+    filter[:, :offset, :, :], filter[:, -offset:, :, :] = 0, 0
+    all_data *= filter
+
+    all_data_x = transform.transform_kspace_to_image(all_data, [1])
+    x0 = int(all_data.shape[1] * 0.25)
+    x1 = int(all_data.shape[1] * 0.75)
+    all_data_x_crop = all_data_x[:, x0:x1, :, :]
+    all_data_crop = transform.transform_image_to_kspace(all_data_x_crop, [1])  # all_data_crop: Cropped kspace
+
+    (ncoils, kx, ky, kz) = all_data_crop.shape
 
     num_low_freq = ref_max_idx - ref_min_idx + 1
     meta = dict()
@@ -69,9 +84,11 @@ for filename in filenames:
     # h5f.create_dataset('kspace', data=all_data)
     # h5f.close()
 
+    # all_data_center: Center-realigned kspace
     all_data_center = np.zeros((ncoils, kx, ky + y_pad, kz + z_pad)).astype(complex)
-    all_data_center[:, :, y_pad:, z_pad:] = all_data
+    all_data_center[:, :, y_pad:, z_pad:] = all_data_crop
 
+    # IFFT along the z-direction => to make 3D to 2D problem.
     all_data_z = transform.transform_kspace_to_image(all_data_center, [3])
     h5f = h5py.File(savepath / f"{'_'.join(filename.stem.split('_')[1:3])}{filename.suffix}", 'w')
     h5f.create_dataset('kspace', data=all_data_z)
