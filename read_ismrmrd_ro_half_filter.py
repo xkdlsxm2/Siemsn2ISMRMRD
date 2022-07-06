@@ -9,10 +9,10 @@ import pathlib
 from tqdm import tqdm
 from ismrmrdtools import show, transform
 
-filepath = pathlib.Path(r"B:\Jinho\MRCP\Measurements\Data_collection\extracted_kdata\data2")
+filepath = pathlib.Path(r"B:\Jinho\MRCP\Measurements\Data_collection\converted")
 # filename = pathlib.Path("meas_MID00059_FID01994_t2_space_cor_p3_trig_384_iso.h5")
 filenames = [pathlib.Path(i) for i in os.listdir(filepath) if '.h5' in i]
-savepath = pathlib.Path(r'X:\data\mrcp\data')
+savepath = pathlib.Path(r'X:\data\mrcp\Additional')
 
 for filename in filenames:
     h5path = filepath / filename
