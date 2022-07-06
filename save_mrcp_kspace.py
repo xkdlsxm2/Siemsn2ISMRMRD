@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import os
 
-DPATH = pathlib.Path(r"X:\data\mrcp\data\multicoil_train")
+DPATH = pathlib.Path(r"X:\data\mrcp\data")
+SAVEPATH = pathlib.Path(r"C:\Users\z0048drc\Desktop\CS_recon\Results\DGX\kspace\PF_x")
 fnames = [pathlib.Path(i) for i in os.listdir(DPATH) if '' in i]
 
 for fname in fnames:
-    # PATH = pathlib.Path(r"C:\Users\z0048drc\Desktop\CS_recon\Results\mrcp") / fname.stem / 'kspace'
-    PATH = pathlib.Path(r"C:\Users\z0048drc\Desktop\CS_recon\Results\DGX\kspace") / fname.stem
+    PATH = SAVEPATH / fname.stem
     with h5py.File(DPATH / fname, "r") as hf:
         kspace = hf["kspace"][:]
     for dataslice in range(kspace.shape[-1]):
