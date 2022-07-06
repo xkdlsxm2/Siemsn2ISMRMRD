@@ -9,7 +9,7 @@ import pathlib
 from tqdm import tqdm
 from ismrmrdtools import show, transform
 
-filepath = pathlib.Path(r"C:\Users\z0048drc\Desktop\data_fm\MRCP\extracted")
+filepath = pathlib.Path(r"B:\Jinho\MRCP\Measurements\Data_collection\extracted_kdata\data2")
 # filename = pathlib.Path("meas_MID00059_FID01994_t2_space_cor_p3_trig_384_iso.h5")
 filenames = [pathlib.Path(i) for i in os.listdir(filepath) if '.h5' in i]
 savepath = pathlib.Path(r'X:\data\mrcp\data')
@@ -72,19 +72,14 @@ for filename in filenames:
     all_data_x_crop = all_data_x[:, x0:x1, :, :]
     all_data_crop = transform.transform_image_to_kspace(all_data_x_crop, [1])  # all_data_crop: Cropped kspace
 
-    (ncoils, kx, ky, kz) = all_data_crop.shape
+    (ncoils, kx, ky, nz) = all_data_crop.shape
 
     num_low_freq = ref_max_idx - ref_min_idx + 1
     meta = dict()
-    for k in ['ncoils', 'kx', 'ky', 'kz', 'y_pad', 'z_pad', 'num_low_freq']:
+    for k in ['ncoils', 'kx', 'ky', 'nz', 'y_pad', 'z_pad', 'num_low_freq']:
         meta[k] = locals()[k]
 
-    # h5f = h5py.File(savepath / savename, 'w')
-    # h5f.create_dataset('kspace', data=all_data)
-    # h5f.close()
-
-    # all_data_center: Center-realigned kspace
-    all_data_center = np.zeros((ncoils, kx, ky + y_pad, kz + z_pad)).astype(complex)
+    all_data_center = np.zeros((ncoils, kx, ky + y_pad, nz + z_pad)).astype(complex)
     all_data_center[:, :, y_pad:, z_pad:] = all_data_crop
 
     # IFFT along the z-direction => to make 3D to 2D problem.
