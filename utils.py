@@ -45,6 +45,11 @@ def pad(encoding):
     pad = pad + 1 if max % 2 == 0 else pad
     return int(pad)
 
+
+def kspace_normalize(kspace):
+    kspace /= np.max(abs(kspace), axis=(1, 2, 3))[:, None, None, None]
+    return kspace
+
 #
 # def save_header(header):
 #     from collections import defaultdict

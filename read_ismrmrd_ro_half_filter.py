@@ -82,6 +82,7 @@ for filename in filenames:
     all_data_center = np.zeros((ncoils, kx, ky + y_pad, nz + z_pad)).astype(complex)
     all_data_center[:, :, y_pad:, z_pad:] = all_data_crop
 
+    all_data_center = utils.kspace_normalize(all_data_center)
     # IFFT along the z-direction => to make 3D to 2D problem.
     all_data_z = transform.transform_kspace_to_image(all_data_center, [3])
     h5f = h5py.File(savepath / f"{'_'.join(filename.stem.split('_')[1:3])}{filename.suffix}", 'w')
